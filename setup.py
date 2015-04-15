@@ -3,7 +3,8 @@ from setuptools import setup, find_packages
 import os
 
 requirements = [
-    'boto>=2.37.0'
+    'boto>=2.37.0',
+    'click>=4.0'
 ]
 
 setup(
