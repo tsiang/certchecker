@@ -16,6 +16,7 @@ setup(
     include_package_data=True,
     author='Steven Tsiang',
     author_email='steven@scopely.com',
+    url='https://github.com/swtrocks/certchecker',
     license=open("LICENSE").read(),
     install_requires=requirements,
     entry_points="""
