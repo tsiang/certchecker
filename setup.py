@@ -10,7 +10,7 @@ requirements = [
 setup(
     name='certchecker',
     description="A tool to check SSL Certificates in AWS",
-    version='0.2.2',
+    version='0.2.3',
     long_description=__doc__,
     packages=find_packages(),
     include_package_data=True,

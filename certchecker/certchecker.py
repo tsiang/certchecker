@@ -1,17 +1,15 @@
 import boto
-import click
 
 class CertChecker():
     def __init__(self, profile):
         self.profile = profile
-        self.cert_list = None
+        self.cert_list = list()
         self.cert_elb_dict = self.get_cert_elb_dict()
         self.cert_exp_dict = self.get_cert_exp_dict()
-        self.result = self.create_result(self.cert_elb_dict, self.cert_exp_dict)
+        self.result = self.create_result()
 
     def get_cert_elb_dict(self):
         cert_elb_dict = dict()
-        cert_list = list()
         c = boto.connect_elb(profile_name=self.profile)
         elbs = c.get_all_load_balancers()
         for lb in elbs:
@@ -20,14 +18,13 @@ class CertChecker():
             for listener in listeners:
                 if listener.ssl_certificate_id:
                     cert_name = listener.ssl_certificate_id.split('/')[-1].encode('utf-8')
-                    cert_list.append(cert_name)
-                    cert_list = set(cert_list)
-                    cert_list = list(cert_list)
+                    self.cert_list.append(cert_name)
+                    self.cert_list = set(self.cert_list)
+                    self.cert_list = list(self.cert_list)
                     if cert_name in cert_elb_dict:
                         cert_elb_dict[cert_name].append(lb)
                     else:
                         cert_elb_dict[cert_name] = [lb]
-        self.cert_list = cert_list
         return cert_elb_dict
 
     def get_cert_exp_dict(self):
@@ -39,21 +36,9 @@ class CertChecker():
             cert_exp_dict[cert_name] = expiration_date
         return cert_exp_dict
 
-    def create_result(self, cert_elb_dict, cert_exp_dict):
+    def create_result(self):
         cert_result = []
-        for cert, elbs in cert_elb_dict.iteritems():
-            cert_result.append({'cert_name':cert, 'elbs': elbs, 'expiration': cert_exp_dict[cert]})
+        for cert, elbs in self.cert_elb_dict.iteritems():
+            cert_result.append({'cert_name':cert, 'elbs': elbs, 'expiration': self.cert_exp_dict[cert]})
         return cert_result
 
-@click.command()
-@click.option(
-    '--profile',
-    default='default',
-    help="Section name in your boto config file"
-)
-def main(profile):
-    cc = CertChecker(profile)
-    print(cc.result)
-
-if __name__ == "__main__":
-    print(main())
