@@ -2,11 +2,12 @@ import boto
 import click
 
 class CertChecker():
-    def __init__(self):
-        self.profile = None
+    def __init__(self, profile):
+        self.profile = profile
         self.cert_list = None
-        self.cert_elb_dict = None
-        self.cert_exp_dict = None
+        self.cert_elb_dict = self.get_cert_elb_dict()
+        self.cert_exp_dict = self.get_cert_exp_dict()
+        self.result = self.create_result(self.cert_elb_dict, self.cert_exp_dict)
 
     def get_cert_elb_dict(self):
         cert_elb_dict = dict()
@@ -51,11 +52,8 @@ class CertChecker():
     help="Section name in your boto config file"
 )
 def main(profile):
-    cc = CertChecker()
-    cc.profile = profile
-    cc.cert_elb_dict = cc.get_cert_elb_dict()
-    cc.cert_exp_dict = cc.get_cert_exp_dict()
-    print(cc.create_result(cc.cert_elb_dict, cc.cert_exp_dict))
+    cc = CertChecker(profile)
+    print(cc.result)
 
 if __name__ == "__main__":
     print(main())
