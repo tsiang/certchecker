@@ -1,4 +1,5 @@
 import boto
+import datetime
 
 class CertChecker():
     def __init__(self, profile):
@@ -33,7 +34,9 @@ class CertChecker():
         for cert_name in self.cert_list:
             metadata = conn.get_server_certificate(cert_name)['get_server_certificate_response']['get_server_certificate_result']['server_certificate']['server_certificate_metadata']
             expiration_date = metadata.expiration.encode('utf-8')
-            cert_exp_dict[cert_name] = expiration_date
+            date_string = datetime.datetime.strptime(expiration_date, "%Y-%m-%dT%H:%M:%SZ")
+            formatted_expiration_date = date_string.strftime('%B %d, %Y %H:%M')
+            cert_exp_dict[cert_name] = formatted_expiration_date
         return cert_exp_dict
 
     def create_result(self):
